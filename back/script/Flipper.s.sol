@@ -2,10 +2,11 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
-import "../src/Flipper.sol";
+import "../src/facet/Flipper.sol";
 
 contract FlipperScript is Script {
     Flipper flipper;
+
     function setUp() public {}
 
     function run() public {
