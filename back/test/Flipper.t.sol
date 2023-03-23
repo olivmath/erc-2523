@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import {Flipper} from "../src/Flipper.sol";
+import {Flipper} from "../src/facet/Flipper.sol";
 
 contract FlipperTest is Test {
     Flipper public flipper;
