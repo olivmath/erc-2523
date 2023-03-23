@@ -41,9 +41,7 @@ contract DiamondLoupe is IDiamondLoupe {
         }
     }
 
-    function facets() external view override returns (Facet[] memory facets_) {}
-
-    function facetAddresses() external view override returns (address[] memory facetAddresses_) {
+    function facetAddresses() public view override returns (address[] memory facetAddresses_) {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         address[] memory uniqueFacetAddresses = new address[](ds.fnSelectorLength);
         //
@@ -69,6 +67,25 @@ contract DiamondLoupe is IDiamondLoupe {
         //
         for (uint256 i = 0; i < count; i++) {
             facetAddresses_[i] = uniqueFacetAddresses[i];
+        }
+    }
+
+    function facets() external view override returns (Facet[] memory facets_) {
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
+        address[] memory uniqueFacetAddresses = facetAddresses();
+        facets_ = new Facet[](uniqueFacetAddresses.length);
+        //
+        //
+        for (uint256 i = 0; i < uniqueFacetAddresses.length; i++) {
+            bytes4[] storage fnSelectors;
+            //
+            //
+            for (uint256 j = 0; j < ds.fnSelectorLength; j++) {
+                if (ds.fnSelectorToFacet[ds.allFnSelectors[j]] == uniqueFacetAddresses[i]) {
+                    fnSelectors.push(ds.allFnSelectors[j]);
+                }
+            }
+            facets_[i] = Facet(uniqueFacetAddresses[i], fnSelectors);
         }
     }
 }
