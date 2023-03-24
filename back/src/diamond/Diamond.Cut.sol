@@ -7,12 +7,22 @@ import "./interfaces/IDiamond.Cut.sol";
 contract DiamondCut is IDiamondCut {
     using DiamondStorageLib for DiamondStorageLib.Storage;
 
-    function facetCutsToBytes(FacetCut[] memory _diamondCut) internal pure returns (bytes[] memory diamondCutBytes) {
+    function facetCutsToBytes(FacetCut[] memory _diamondCut)
+        internal
+        pure
+        returns (bytes[] memory diamondCutBytes)
+    {
         diamondCutBytes = new bytes[](_diamondCut.length);
+        //
+        //
         for (uint256 i = 0; i < _diamondCut.length; i++) {
             bytes memory selectorsBytes = abi.encodePacked(_diamondCut[i].functionSelectors);
-            diamondCutBytes[i] = abi.encode(_diamondCut[i].facetAddress, uint8(_diamondCut[i].action), selectorsBytes);
+            diamondCutBytes[i] = abi.encode(
+                _diamondCut[i].facetAddress, uint8(_diamondCut[i].action), selectorsBytes
+            );
         }
+        //
+        //
         return diamondCutBytes;
     }
 
@@ -26,12 +36,15 @@ contract DiamondCut is IDiamondCut {
     function removeSelector(bytes4 selector) internal {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         uint256 selectorIndex;
+        //
+        //
         for (uint256 i = 0; i < ds.allFnSelectors.length; i++) {
             if (ds.allFnSelectors[i] == selector) {
                 selectorIndex = i;
                 break;
             }
         }
+        //
         //
         uint256 index = ds.allFnSelectors.length - 1;
         ds.allFnSelectors[selectorIndex] = ds.allFnSelectors[index];
@@ -42,7 +55,9 @@ contract DiamondCut is IDiamondCut {
 
     // essa funcao eh responsavel por 'cortar o diamante'
     // isso significa que posso adicionar/editar/remover uma face (contrato) do diamante
-    function diamondCut(FacetCut[] memory _diamondCut, address _constructor, bytes memory _calldata) external {
+    function diamondCut(FacetCut[] memory _diamondCut, address _constructor, bytes memory _calldata)
+        external
+    {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         //
         //
@@ -56,6 +71,8 @@ contract DiamondCut is IDiamondCut {
             for (uint256 j = 0; j < functionSelectors.length; j++) {
                 bytes4 functionSelector = functionSelectors[j];
                 address currentFacetAddress = ds.fnSelectorToFacet[functionSelector];
+                //
+                //
                 if (currentFacetAddress == address(0x0) && action == Action.Save) {
                     ds.fnSelectorToFacet[functionSelector] = facetAddress;
                     addSelector(functionSelector);
@@ -71,7 +88,8 @@ contract DiamondCut is IDiamondCut {
                 }
             }
         }
-
+        //
+        //
         if (_constructor != address(0x0)) {
             // call constructor of contract
             (bool success,) = _constructor.delegatecall(_calldata);
@@ -79,7 +97,8 @@ contract DiamondCut is IDiamondCut {
                 revert("FAIL_INITIALIZATION");
             }
         }
-
+        //
+        //
         emit DiamondCuted(facetCutsToBytes(_diamondCut), _constructor, _calldata);
     }
 }
