@@ -7,17 +7,11 @@ import "./interfaces/IDiamond.Cut.sol";
 contract DiamondCut is IDiamondCut {
     using DiamondStorageLib for DiamondStorageLib.Storage;
 
-    function facetCutsToBytes(FacetCut[] memory _diamondCut)
-        internal
-        pure
-        returns (bytes[] memory diamondCutBytes)
-    {
+    function facetCutsToBytes(FacetCut[] memory _diamondCut) internal pure returns (bytes[] memory diamondCutBytes) {
         diamondCutBytes = new bytes[](_diamondCut.length);
         for (uint256 i = 0; i < _diamondCut.length; i++) {
             bytes memory selectorsBytes = abi.encodePacked(_diamondCut[i].functionSelectors);
-            diamondCutBytes[i] = abi.encode(
-                _diamondCut[i].facetAddress, uint8(_diamondCut[i].action), selectorsBytes
-            );
+            diamondCutBytes[i] = abi.encode(_diamondCut[i].facetAddress, uint8(_diamondCut[i].action), selectorsBytes);
         }
         return diamondCutBytes;
     }
@@ -48,9 +42,7 @@ contract DiamondCut is IDiamondCut {
 
     // essa funcao eh responsavel por 'cortar o diamante'
     // isso significa que posso adicionar/editar/remover uma face (contrato) do diamante
-    function diamondCut(FacetCut[] memory _diamondCut, address _constructor, bytes memory _calldata)
-        external
-    {
+    function diamondCut(FacetCut[] memory _diamondCut, address _constructor, bytes memory _calldata) external {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         //
         //
