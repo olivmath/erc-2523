@@ -1,26 +1,33 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.18;
 
-import "forge-std/Test.sol";
-import {Flipper} from "../src/facet/Flipper.sol";
+import "./BaseSetup.sol";
 
-contract FlipperTest is Test {
-    Flipper public flipper;
+contract FlipperFacetTest is BaseSetup {
+    bytes result;
 
-    function setUp() public {
-        flipper = new Flipper(true);
+    function setUp() public virtual override {
+        BaseSetup.setUp();
     }
 
     function testFlip() public {
-        bool initialValue = flipper.get();
-        assertEq(initialValue, true, "Initial value should be true");
+        //call get() -> bool (6d4ce63c)
+        (, result) = address(diamond).call(abi.encodeWithSelector(0x6d4ce63c));
+        bool value = abi.decode(result, (bool));
+        assertEq(value, false, "Initial value should be false");
 
-        flipper.flip();
-        bool newValue = flipper.get();
-        assertEq(newValue, false, "Value should be false after flip");
+        //call flip (cde4efa9)
+        address(diamond).call(abi.encodeWithSelector(0xcde4efa9));
+        //call get (6d4ce63c)
+        (, result) = address(diamond).call(abi.encodeWithSelector(0x6d4ce63c));
+        bool value2 = abi.decode(result, (bool));
+        assertEq(value2, true, "Value should be true after flip");
 
-        flipper.flip();
-        newValue = flipper.get();
-        assertEq(newValue, true, "Value should be true after flip");
+        //call flip (cde4efa9)
+        address(diamond).call(abi.encodeWithSelector(0xcde4efa9));
+        //call get (6d4ce63c)
+        (, result) = address(diamond).call(abi.encodeWithSelector(0x6d4ce63c));
+        bool value3 = abi.decode(result, (bool));
+        assertEq(value3, false, "Value should be false after flip");
     }
 }

@@ -3,18 +3,21 @@ pragma solidity ^0.8.18;
 
 import "../diamond/Diamond.Storage.Lib.sol";
 
-contract FlipperFacet {
+contract CounterFacet {
     using DiamondStorageLib for DiamondStorageLib.Storage;
 
-    // cde4efa9
-    function flip() public {
+    function increment() public {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
-        ds.value = !ds.value;
+        ds.count += 1;
     }
 
-    // 6d4ce63c
-    function get() public view returns (bool) {
+    function decrement() public {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
-        return ds.value;
+        ds.count -= 1;
+    }
+
+    function getCounter() public view returns (uint256) {
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
+        return ds.count;
     }
 }

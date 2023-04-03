@@ -6,6 +6,8 @@ library DiamondStorageLib {
 
     struct Storage {
         bool value;
+        uint256 count;
+
         mapping(bytes4 => address) fnSelectorToFacet;
         mapping(address => bytes4[]) facetToFnSelector;
         uint256 fnSelectorLength;
