@@ -7,50 +7,47 @@ import "./interfaces/IDiamond.Loupe.sol";
 contract DiamondLoupe is IDiamondLoupe {
     using DiamondStorageLib for DiamondStorageLib.Storage;
 
-    function facetAddress(bytes4 fnSelector)
-        external
-        view
-        override
-        returns (address facetAddress_)
-    {
-        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
-        facetAddress_ = ds.fnSelectorToFacet[fnSelector];
+    function facetAddress(
+        bytes4 fnSelector
+    ) external view override returns (address facetAddress_) {
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib
+            .getDiamondStorage();
+        facetAddress_ = ds.fn2facet[fnSelector];
     }
 
-    function facetFunctionSelectors(address facet_)
-        external
-        view
-        override
-        returns (bytes4[] memory fnSelectors)
-    {
-        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
-        fnSelectors = new bytes4[](ds.fnSelectorLength);
+    function facetFunctionSelectors(
+        address facet_
+    ) external view override returns (bytes4[] memory) {
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib
+            .getDiamondStorage();
+        bytes4[] memory fnSelectors;
         uint256 index = 0;
         //
         //
-        for (uint256 i = 0; i < ds.fnSelectorLength; i++) {
-            if (ds.fnSelectorToFacet[ds.allFnSelectors[i]] == facet_) {
-                fnSelectors[index++] = ds.allFnSelectors[i];
+        for (uint256 i = 0; i < ds.fnLen; i++) {
+            if (ds.fn2facet[ds.allFunctions[i]] == facet_) {
+                fnSelectors.push(ds.allFunctions[i]);
                 index += 1;
             }
         }
-        //
-        //
-        assembly {
-            mstore(fnSelectors, index)
-        }
+
+        return fnSelectors;
     }
 
-    function facetAddresses() public view override returns (address[] memory facetAddresses_) {
-        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
-        address[] memory uniqueFacetAddresses = new address[](
-            ds.fnSelectorLength
-        );
+    function facetAddresses()
+        public
+        view
+        override
+        returns (address[] memory facetAddresses_)
+    {
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib
+            .getDiamondStorage();
+        address[] memory uniqueFacetAddresses = new address[](ds.fnLen);
         //
         //
         uint256 count = 0;
-        for (uint256 i = 0; i < ds.fnSelectorLength; i++) {
-            address facetAddress_ = ds.fnSelectorToFacet[ds.allFnSelectors[i]];
+        for (uint256 i = 0; i < ds.fnLen; i++) {
+            address facetAddress_ = ds.fn2facet[ds.allFunctions[i]];
             bool isUnique = true;
             for (uint256 j = 0; j < count; j++) {
                 if (uniqueFacetAddresses[j] == facetAddress_) {
@@ -73,7 +70,8 @@ contract DiamondLoupe is IDiamondLoupe {
     }
 
     function facets() external view override returns (Facet[] memory facets_) {
-        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib
+            .getDiamondStorage();
         address[] memory uniqueFacetAddresses = facetAddresses();
         facets_ = new Facet[](uniqueFacetAddresses.length);
         //
@@ -82,8 +80,10 @@ contract DiamondLoupe is IDiamondLoupe {
             //
             //
             uint256 selectorCount = 0;
-            for (uint256 j = 0; j < ds.fnSelectorLength; j++) {
-                if (ds.fnSelectorToFacet[ds.allFnSelectors[j]] == uniqueFacetAddresses[i]) {
+            for (uint256 j = 0; j < ds.fnLen; j++) {
+                if (
+                    ds.fn2facet[ds.allFunctions[j]] == uniqueFacetAddresses[i]
+                ) {
                     selectorCount += 1;
                 }
             }
@@ -91,9 +91,11 @@ contract DiamondLoupe is IDiamondLoupe {
             //
             bytes4[] memory fnSelectors = new bytes4[](selectorCount);
             uint256 index = 0;
-            for (uint256 j = 0; j < ds.fnSelectorLength; j++) {
-                if (ds.fnSelectorToFacet[ds.allFnSelectors[j]] == uniqueFacetAddresses[i]) {
-                    fnSelectors[index] = ds.allFnSelectors[j];
+            for (uint256 j = 0; j < ds.fnLen; j++) {
+                if (
+                    ds.fn2facet[ds.allFunctions[j]] == uniqueFacetAddresses[i]
+                ) {
+                    fnSelectors[index] = ds.allFunctions[j];
                     index += 1;
                 }
             }

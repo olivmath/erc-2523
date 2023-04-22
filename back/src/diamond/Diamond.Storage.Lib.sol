@@ -8,10 +8,10 @@ library DiamondStorageLib {
         bool value;
         uint256 count;
 
-        mapping(bytes4 => address) fnSelectorToFacet;
-        mapping(address => bytes4[]) facetToFnSelector;
-        uint256 fnSelectorLength;
-        bytes4[] allFnSelectors;
+        mapping(bytes4 => address) fn2facet;
+        mapping(address => bytes4[]) facet2fn;
+        uint256 fnLen;
+        bytes4[] allFunctions;
     }
 
     function getDiamondStorage() internal pure returns (Storage storage ds) {

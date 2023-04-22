@@ -12,6 +12,9 @@ contract CounterFacetTest is BaseSetup {
     }
 
     function testCounter() public {
+        contract.user()
+        contract.call(0x1312312)
+
         // 8ada066e  =>  getCounter() -> uint256
         (, result) = address(diamond).call(abi.encodeWithSelector(0x8ada066e));
         value = abi.decode(result, (uint256));

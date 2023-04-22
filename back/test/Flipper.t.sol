@@ -30,4 +30,10 @@ contract FlipperFacetTest is BaseSetup {
         bool value3 = abi.decode(result, (bool));
         assertEq(value3, false, "Value should be false after flip");
     }
+
+
+    function test_flip_loupe() public {
+        bytes4[] memory fns = diamond.facetFunctionSelectors(address(flipperFacet));
+        assertEq(fns.length, 2);
+    }
 }

@@ -11,7 +11,7 @@ contract Diamond is DiamondCut, DiamondLoupe {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
 
         // Obter o endereço da faceta correspondente ao seletor de função da chamada
-        address facet = ds.fnSelectorToFacet[msg.sig];
+        address facet = ds.fn2facet[msg.sig];
         require(facet != address(0), "Facet not found");
 
         // Executar a chamada da função na faceta usando delegatecall

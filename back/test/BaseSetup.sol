@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import "../lib/forge-std/src/Test.sol";
-import "../src/diamond/Diamond.sol";
-import "../src/diamond/Diamond.Cut.sol";
 import {FlipperFacet} from "../src/facet/Flipper.Facet.sol";
 import {CounterFacet} from "../src/facet/Counter.Facet.sol";
+import "../src/diamond/Diamond.Cut.sol";
+import "../lib/forge-std/src/Test.sol";
+import "../src/diamond/Diamond.sol";
+import "../src/facet/Sum.Facet.sol";
 
 contract BaseSetup is Test {
-    Diamond public diamond;
+    IDiamondCut.FacetCut[] public diamondCut;
     FlipperFacet public flipperFacet;
     CounterFacet public counterFacet;
-    IDiamondCut.FacetCut[] public diamondCut;
+        SumFacet public sum;
+    Diamond public diamond;
 
     function setUp() public virtual {
         // ----------------
@@ -49,12 +51,27 @@ contract BaseSetup is Test {
 
         IDiamondCut.FacetCut memory counterFacetCut = IDiamondCut.FacetCut({
             facetAddress: address(counterFacet),
-            action: IDiamondCut.Action.Save,
+            action: IDiamondCut.Action.Delete,
             functionSelectors: selectors
+        });
+
+        // ----------------
+        // SUM CONTRACT
+        // ----------------
+        // - sum(uint256, uint256) -> bool
+        bytes4[] memory sumSelectors = new bytes4[](1);
+        sumSelectors[0] = SumFacet.sum.selector;
+        sum = new SumFacet();
+
+        IDiamondCut.FacetCut memory sumFacetCut = IDiamondCut.FacetCut({
+            facetAddress: address(sum),
+            action: IDiamondCut.Action.Save,
+            functionSelectors: sumSelectors
         });
 
         diamondCut.push(flipperFacetCut);
         diamondCut.push(counterFacetCut);
+        diamondCut.push(sumFacetCut);
         diamond.diamondCut(diamondCut, address(0), new bytes(0));
     }
 }
